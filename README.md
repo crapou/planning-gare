@@ -19,6 +19,16 @@ npm run preview   # sert le build de production en local
 npm run lint      # vérifie le code avec ESLint
 ```
 
+## Déploiement sur GitHub Pages
+
+Le dépôt contient un workflow GitHub Actions ([.github/workflows/deploy.yml](.github/workflows/deploy.yml)) qui build et déploie automatiquement l'app à chaque push sur `main`. Pour l'activer :
+
+1. Sur GitHub, aller dans **Settings → Pages**.
+2. Dans **Build and deployment → Source**, choisir **GitHub Actions**.
+3. Pousser sur `main` (ou relancer le workflow depuis l'onglet **Actions**) : le site est publié sur `https://<utilisateur>.github.io/planning-gare/`.
+
+Le `base` du build Vite ([vite.config.ts](vite.config.ts)) est réglé sur `/planning-gare/` pour correspondre à ce chemin de site de projet. En cas de renommage du dépôt, mettre cette valeur à jour en conséquence.
+
 ## Fonctionnalités
 
 - **Gestion des agents** : ajout, modification, suppression (avec confirmation), regroupés par type de contrat (`RDE`, `GDT`, `ADS`, `CDD`), chacun avec sa couleur dédiée.
