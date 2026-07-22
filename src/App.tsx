@@ -14,7 +14,6 @@ import { usePlanningData } from './utils/storage';
 import { addWeeks, getMonday, getWeekDates, toISODate } from './utils/date';
 import { formatShiftCell } from './utils/time';
 import { CONTRAT_STYLES } from './utils/colors';
-import { SEED_WEEK_MONDAY } from './data/seed';
 
 import AgentSidebar from './components/AgentSidebar';
 import PlanningGrid from './components/PlanningGrid';
@@ -31,7 +30,7 @@ type DragActiveData =
 
 export default function App() {
   const { data, setData } = usePlanningData();
-  const [weekMonday, setWeekMonday] = useState(() => getMonday(SEED_WEEK_MONDAY));
+  const [weekMonday, setWeekMonday] = useState(() => getMonday(new Date()));
   const [viewMode, setViewMode] = useState<ViewMode>('agent');
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
   const [editTarget, setEditTarget] = useState<ShiftEditTarget | null>(null);
@@ -88,6 +87,35 @@ export default function App() {
     const shiftId = editTarget.shift.id;
     setData((d) => ({ ...d, shifts: d.shifts.filter((s) => s.id !== shiftId) }));
     setEditTarget(null);
+  };
+
+  // ---- Répéter la semaine précédente ----
+  const repeatLastWeek = () => {
+    const previousMonday = addWeeks(weekMonday, -1);
+    const previousISOs = getWeekDates(previousMonday).map(toISODate);
+    const previousShifts = data.shifts.filter((s) => previousISOs.includes(s.jour));
+
+    if (previousShifts.length === 0) {
+      window.alert("Aucun horaire trouvé pour la semaine précédente.");
+      return;
+    }
+    const confirmed = window.confirm(
+      'Cela va remplacer les horaires de la semaine affichée par ceux de la semaine précédente. Continuer ?',
+    );
+    if (!confirmed) return;
+
+    setData((d) => {
+      const shiftsOutsideWeek = d.shifts.filter((s) => !weekISOs.includes(s.jour));
+      const copiedShifts: Shift[] = previousShifts.map((s) => ({
+        id: uuid(),
+        agentId: s.agentId,
+        jour: weekISOs[previousISOs.indexOf(s.jour)],
+        repos: s.repos,
+        heureDebut: s.heureDebut,
+        heureFin: s.heureFin,
+      }));
+      return { ...d, shifts: [...shiftsOutsideWeek, ...copiedShifts] };
+    });
   };
 
   // ---- Drag & drop ----
@@ -157,6 +185,19 @@ export default function App() {
             onNext={() => setWeekMonday((m) => addWeeks(m, 1))}
             onToday={() => setWeekMonday(getMonday(new Date()))}
           />
+          <button
+            onClick={repeatLastWeek}
+            className="flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-card transition hover:bg-gray-50"
+            title="Copier les horaires de la semaine précédente sur la semaine affichée"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M17 2l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M3 11V9a4 4 0 0 1 4-4h14" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M7 22l-4-4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M21 13v2a4 4 0 0 1-4 4H3" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Répéter la semaine passée
+          </button>
           <ViewToggle mode={viewMode} onChange={setViewMode} />
           <PrintMenu data={data} weekDates={weekDates} />
         </div>
