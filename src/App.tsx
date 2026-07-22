@@ -14,7 +14,6 @@ import { usePlanningData } from './utils/storage';
 import { addWeeks, getMonday, getWeekDates, toISODate } from './utils/date';
 import { formatShiftCell } from './utils/time';
 import { CONTRAT_STYLES } from './utils/colors';
-import { printWeek } from './utils/pdf';
 import { SEED_WEEK_MONDAY } from './data/seed';
 
 import AgentSidebar from './components/AgentSidebar';
@@ -23,6 +22,7 @@ import DayView from './components/DayView';
 import WeekSelector from './components/WeekSelector';
 import ViewToggle, { type ViewMode } from './components/ViewToggle';
 import ShiftEditModal, { type ShiftEditTarget } from './components/ShiftEditModal';
+import PrintMenu from './components/PrintMenu';
 
 type DragActiveData =
   | { type: 'agent'; agentId: string }
@@ -158,17 +158,7 @@ export default function App() {
             onToday={() => setWeekMonday(getMonday(new Date()))}
           />
           <ViewToggle mode={viewMode} onChange={setViewMode} />
-          <button
-            onClick={() => printWeek(data, weekDates)}
-            className="flex items-center gap-1.5 rounded-full bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-gray-800"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M6 9V2h12v7" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" strokeLinecap="round" strokeLinejoin="round" />
-              <rect x="6" y="14" width="12" height="8" rx="1" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            Imprimer
-          </button>
+          <PrintMenu data={data} weekDates={weekDates} />
         </div>
       </header>
 

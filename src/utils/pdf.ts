@@ -203,13 +203,27 @@ export function generateEmargementPDF(data: PlanningData, weekDates: Date[]): js
   return doc;
 }
 
-function fileDateSuffix(weekDates: Date[]): string {
+export function fileDateSuffix(weekDates: Date[]): string {
   return `${toISODate(weekDates[0])}_${toISODate(weekDates[6])}`;
 }
 
-/** Génère et déclenche le téléchargement des deux PDF (planning + émargement). */
+/** Génère et télécharge uniquement le PDF du planning hebdomadaire. */
+export function downloadPlanningPDF(data: PlanningData, weekDates: Date[]): void {
+  generatePlanningPDF(data, weekDates).save(`planning_${fileDateSuffix(weekDates)}.pdf`);
+}
+
+/** Génère et télécharge uniquement les feuilles d'émargement. */
+export function downloadEmargementPDF(data: PlanningData, weekDates: Date[]): void {
+  generateEmargementPDF(data, weekDates).save(`emargement_${fileDateSuffix(weekDates)}.pdf`);
+}
+
+/**
+ * Génère et déclenche le téléchargement des deux PDF (planning + émargement).
+ * Les deux `.save()` sont espacés dans le temps : déclenchés dans la même frame,
+ * certains navigateurs (Chrome) bloquent silencieusement le second téléchargement
+ * automatique et n'affichent que le premier.
+ */
 export function printWeek(data: PlanningData, weekDates: Date[]): void {
-  const suffix = fileDateSuffix(weekDates);
-  generatePlanningPDF(data, weekDates).save(`planning_${suffix}.pdf`);
-  generateEmargementPDF(data, weekDates).save(`emargement_${suffix}.pdf`);
+  downloadPlanningPDF(data, weekDates);
+  setTimeout(() => downloadEmargementPDF(data, weekDates), 400);
 }
