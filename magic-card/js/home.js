@@ -4,32 +4,36 @@
 import { S, save } from './store.js';
 import { $, clamp } from './util.js';
 
-const REF_W = 393, REF_H = 852; // iPhone 15/16 (Pro) points, used for the default grid
+// Default grid measured on the performer's own App Library screenshot
+// (1260 × 2736 px = 420 × 912 pt @3x). Stored as fractions, so it scales to any screen.
+const REF_W = 1260, REF_H = 2736;
+const ICON = 204;                      // icon size in px
+const COLS = [117, 358, 698, 939];     // left folder: 117/358, right folder: 698/939
+const ROW0 = 567, ROW_PITCH = 627;     // top icon row of each folder row
+const INNER = 243;                     // second icon row inside a folder
 
-/** Default App Library grid: 2 columns of folders, 2×2 icons each. Calibrate in the editor. */
+/** Default App Library zones. Fine-tune them in the zone editor if needed. */
 export function defaultZones() {
   const zones = [];
-  const platter = 158, pad = 11, icon = 63, gap = 10;
-  const cols = [28, 207];
-  const rows = [116, 316, 516, 716];
   let n = 0;
-  rows.forEach((py, r) => {
-    cols.forEach((px, c) => {
-      const cells = [[0, 0], [1, 0], [0, 1], [1, 1]];
-      cells.forEach(([i, j], k) => {
-        const x = px + pad + i * (icon + gap), y = py + pad + j * (icon + gap);
-        if (y + icon > REF_H) return;
-        const cluster = r > 0 && k === 3; // bottom-right = 4 mini icons
+  for (let r = 0; r < 4; r++) {
+    for (let c = 0; c < 4; c++) {
+      for (let j = 0; j < 2; j++) {
+        const x = COLS[c], y = ROW0 + r * ROW_PITCH + j * INNER;
+        if (y + ICON > REF_H) continue;
+        const folderRight = c % 2 === 1;
+        // bottom-right of each folder is a cluster of 4 mini icons (except "Suggestions")
+        const cluster = folderRight && j === 1 && !(r === 0 && c === 1);
         zones.push({
           id: 'z' + n++,
-          x: x / REF_W, y: y / REF_H, w: icon / REF_W, h: icon / REF_H,
+          x: x / REF_W, y: y / REF_H, w: ICON / REF_W, h: ICON / REF_H,
           r: cluster ? 0.2 : 0.225,
-          type: r === 3 && c === 0 && k === 0 ? 'camera' : 'icon',
+          // Camera = top-right icon of the bottom-left folder
+          type: r === 3 && c === 1 && j === 0 ? 'camera' : 'icon',
         });
-      });
-      void platter;
-    });
-  });
+      }
+    }
+  }
   return zones;
 }
 
@@ -49,8 +53,12 @@ export class Home {
 
     this.img.addEventListener('load', () => { this.pixels = null; this.updateDebug(); if (this.wallFailed) this.buildWallFallback(); });
     this.img.addEventListener('error', () => { $('#home-missing').hidden = false; });
-    this.wall.addEventListener('error', () => { this.wallFailed = true; this.wall.hidden = true; this.buildWallFallback(); });
-    if (this.img.complete && this.img.naturalWidth === 0 && this.img.src) $('#home-missing').hidden = false;
+    const wallFail = () => { this.wallFailed = true; this.wall.hidden = true; this.buildWallFallback(); };
+    this.wall.addEventListener('error', wallFail);
+    // The images may already have loaded or failed before this module ran.
+    if (this.img.complete && this.img.naturalWidth === 0) $('#home-missing').hidden = false;
+    if (this.wall.complete && this.wall.naturalWidth === 0) wallFail();
+    if (this.img.complete && this.img.naturalWidth) this.updateDebug();
 
     this.bindInput();
     this.bindEditor();
@@ -303,7 +311,7 @@ export class Home {
       const sel = zs.find((q) => q.id === this.sel);
       switch (b.dataset.z) {
         case 'add': {
-          const base = sel || { w: 63 / REF_W, h: 63 / REF_H, r: 0.225 };
+          const base = sel || { w: ICON / REF_W, h: ICON / REF_H, r: 0.225 };
           const nz = { id: 'z' + Date.now().toString(36), x: 0.42, y: 0.45, w: base.w, h: base.h, r: base.r || 0.225, type: 'icon' };
           zs.push(nz); this.sel = nz.id; break;
         }
