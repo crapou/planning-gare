@@ -41,16 +41,14 @@
     <!-- ============ SCREEN 2 : Camera (selfie) ============ -->
     <section id="camera" class="screen" hidden>
       <div id="cam-root">
-        <div class="cam-top">
-          <div class="cam-ico" id="cam-flash" aria-hidden="true">
-            <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="14.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M17.6 7.5 10.8 17.3h4.6l-1.2 7.2 6.9-9.9h-4.6z" fill="currentColor"/><path d="M8.6 8.6 23.4 23.4" stroke="#000" stroke-width="3.6"/><path d="M8.6 8.6 23.4 23.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          </div>
-          <div class="cam-ico" id="cam-chevron" aria-hidden="true">
-            <svg viewBox="0 0 32 32"><path d="M9.5 19 16 12.6 22.5 19" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-          <div class="cam-ico" id="cam-live" aria-hidden="true">
-            <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="3.2" fill="currentColor"/><circle cx="16" cy="16" r="7.4" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="16" cy="16" r="12.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="0.1 2.62" stroke-linecap="round"/><g class="live-slash"><path d="M6 6 26 26" stroke="#000" stroke-width="3.6"/><path d="M6 6 26 26" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></g></svg>
-          </div>
+        <!-- top: format pill + controls pill (iOS 26) -->
+        <div class="cam-pill" id="cam-heif"><span class="heif">HEIF</span><span class="mp">24</span></div>
+        <div class="cam-pill" id="cam-ctrls" aria-hidden="true">
+          <!-- glyphs are drawn as in camera_ref.png (phone sideways) and rotated by --glyph-rot -->
+          <svg class="rg" style="left:18.3px" viewBox="0 0 70 70"><mask id="moonm"><rect width="70" height="70" fill="#fff"/><circle cx="24" cy="19" r="19" fill="#000"/></mask><circle cx="34" cy="30" r="22" fill="#f8d748" mask="url(#moonm)"/><text x="0" y="0" transform="translate(23 21) rotate(-90)" text-anchor="middle" dominant-baseline="central" font-size="24" font-weight="600" fill="#f8d748" font-family="-apple-system,system-ui,sans-serif">3</text></svg>
+          <svg class="rg" style="left:53.3px" viewBox="0 0 70 70"><g transform="rotate(-90 35 35)"><path d="M38 12 22 37h11l-3 21 17-27H36z" fill="#fff"/></g><path d="M16 52 52 17" stroke="#1e1f1f" stroke-width="8"/><path d="M16 52 52 17" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/></svg>
+          <svg class="rg" style="left:88.3px" viewBox="0 0 70 70"><circle cx="34" cy="35" r="24" fill="none" stroke="#fff" stroke-width="2.4" stroke-dasharray="0.1 4.1" stroke-linecap="round"/><circle cx="34" cy="35" r="16" fill="none" stroke="#fff" stroke-width="2.6"/><circle cx="34" cy="35" r="8" fill="#fff"/><path d="M13 56 55 13" stroke="#1e1f1f" stroke-width="8"/><path d="M13 56 55 13" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/></svg>
+          <svg class="rg" style="left:123.3px" viewBox="0 0 70 70"><g fill="#fff"><circle cx="26" cy="18" r="5"/><circle cx="43" cy="18" r="5"/><circle cx="26" cy="35" r="5"/><circle cx="43" cy="35" r="5"/><circle cx="26" cy="52" r="5"/><circle cx="43" cy="52" r="5"/></g></svg>
         </div>
 
         <div id="preview">
@@ -62,24 +60,18 @@
           <div id="dbg-text" class="debug-badge" hidden></div>
           <div id="focus-box" hidden><i class="fb-sun"></i></div>
           <div id="ae-lock" hidden>VERROUILLAGE AE/AF</div>
-          <div id="cam-zoom" aria-hidden="true">
-            <svg class="zoom-arrows" viewBox="0 0 32 32"><path d="M18.5 8.5h5v5M23.5 8.5l-5.7 5.7M13.5 23.5h-5v-5M8.5 23.5l5.7-5.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span class="zoom-pill">1×</span>
-          </div>
+          <div id="cam-grid"><i></i><i></i><i></i><i></i></div>
+          <div id="cam-zoom" aria-hidden="true"><span>1,4×</span></div>
+          <div id="cam-zoom2" aria-hidden="true"><span>2</span></div>
           <div id="shutter-flash"></div>
           <div id="cam-denied" hidden></div>
         </div>
 
-        <div class="cam-modes"><div id="mode-track">
-          <span>ACCÉLÉRÉ</span><span>RALENTI</span><span>CINÉMATIQUE</span><span>VIDÉO</span><span class="on">PHOTO</span><span>PORTRAIT</span>
-        </div></div>
-
-        <div class="cam-bottom">
-          <div id="cam-thumb"><canvas id="thumb-canvas" width="138" height="138"></canvas></div>
-          <div id="cam-shutter"><i></i></div>
-          <div id="cam-flip">
-            <svg viewBox="0 0 32 32"><path d="M9.2 13.2a7.4 7.4 0 0 1 13.3-2.7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="m23.9 7.2-.6 4.9-4.7-1.6z" fill="currentColor"/><path d="M22.8 18.8a7.4 7.4 0 0 1-13.3 2.7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="m8.1 24.8.6-4.9 4.7 1.6z" fill="currentColor"/></svg>
-          </div>
+        <div id="cam-shutter"><i></i></div>
+        <div id="cam-thumb"><canvas id="thumb-canvas" width="144" height="144"></canvas></div>
+        <div id="cam-modes"><b class="sel"></b><span class="m-video">VIDÉO</span><span class="m-photo">PHOTO</span></div>
+        <div id="cam-flip">
+          <svg class="rg" viewBox="0 0 70 70"><g fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round"><path d="M17.3 52.4A27 27 0 0 1 33 8.1"/><path d="M52.7 17.6A27 27 0 0 1 37 61.9"/></g><path d="M41.5 8.3 31.5 1.5v13.6z" fill="#fff"/><path d="M28.5 61.7 38.5 68.5V54.9z" fill="#fff"/></svg>
         </div>
 
         <img id="cam-ref" src="assets/camera_ref.png" alt="" draggable="false" hidden>

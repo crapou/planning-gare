@@ -130,10 +130,17 @@ Settings cover the fake card, Mode A or B, overlay calibration, the reveal effec
 4. **Status-bar strip:** by default it covers the iOS safe-area height. If a piece of the old clock or battery still shows, raise **Bande barre d'état** by a few pixels. If your App Library background is blurred, add **Flou de la bande**.
 
 ### b) Camera UI vs. your `camera_ref.png`
-1. Settings → **Calque camera_ref.png** at ~50 %.
+The Camera UI copies the **iOS 26** layout, and every position and size is measured on your `camera_ref.png` (1260×2736 px = 420×912 pt): the HEIF pill, the control pill (night mode, flash, Live, more), the 4:3 preview at 141 pt, the rule-of-thirds grid, the "1,4×"/"2" zoom, the shutter, the round thumbnail, the VIDÉO|PHOTO capsule and the flip button.
+
+Your screenshot was taken with the phone **sideways**, so iOS had turned the icons and the zoom labels by 90°. In the trick you hold the phone upright, so by default the app shows them upright, like the real app would (setting **Icônes = Téléphone droit**).
+
+To check the alignment on the phone:
+1. Settings: **Icônes = Comme la capture** and **Calque camera_ref.png** ≈ 50 %.
 2. Open the Camera. Your screenshot sits on top of the rebuilt UI.
-3. Go back to settings and adjust **Bande noire haute**, **Décalage aperçu**, **Écart modes** and **Hauteur déclencheur** until the preview edges, the mode labels and the shutter line up exactly. Also pick the **zoom** button style and the **Live** icon look to match your screenshot.
-4. Set the overlay back to **0 %**.
+3. If anything is off by a few points, use **Décalage pilules haut**, **Décalage aperçu** and **Décalage commandes bas**.
+4. Set it back to **Téléphone droit** and **0 %** before performing.
+
+`assets/thumb.png` is your real last photo, cropped from the screenshot. Replace it if your latest photo changes.
 
 ### c) Card overlay (Mode A, the default)
 1. Settings → **Calibrer la position de la carte…** opens the Camera in calibration mode.
@@ -158,7 +165,7 @@ Debug mode shows the UI fps, detection fps, detection time per frame and the det
 - The App Library is your own screenshot at 1:1 pixels, and the real live iOS status bar draws on top. The frozen one is covered by the matching crop of your wallpaper.
 - The iOS press effect (darken + shrink), with the folder-platter colour filled in behind the shrunk icon.
 - The app grows from the icon to full screen on a spring curve (CSS `linear()` spring, ~430 ms). The icon picture crossfades into the app and the App Library zooms slightly behind it. The reverse animation plays when you swipe up from the bottom edge.
-- The Camera UI is drawn in HTML/CSS/SVG (crisp at 3x) with the system font: flash, chevron, Live, a 4:3 preview, the French modes (ACCÉLÉRÉ, RALENTI, CINÉMATIQUE, VIDÉO, **PHOTO** in yellow, PORTRAIT), shutter, thumbnail, flip button and front-camera zoom button.
+- The iOS 26 Camera UI is drawn in HTML/CSS/SVG (crisp at 3x) with the system font. Each element is measured on your screenshot, including the yellow focus square that appears at the centre when the Camera opens.
 - The preview is mirrored like the real front camera, and so is the fake card, so its indices read the way a real card's would in a selfie.
 - **Lighting:** about 7 times per second, the app reads the pixels of the real card under the overlay. It estimates the paper white in each quadrant (which gives the light gradient and colour cast) and the ink's black level, then re-lights the fake card to match.
 - Camera blur and soft edges are baked into the texture. Animated sensor grain sits on top. Corners are rounded and feathered.
@@ -168,7 +175,7 @@ Debug mode shows the UI fps, detection fps, detection time per frame and the det
 - The screen never dims: Screen Wake Lock API, with a silent looping video as a fallback.
 
 ### Limits you can't get around on iOS
-- **Status bar in the Camera:** the real Camera app hides the status bar. A web app can't, so the live clock and battery stay visible at the top. The Camera controls sit just below them.
+- **Status bar in the Camera:** the real Camera app hides the status bar. A web app can't, so the live clock and battery stay visible at the top, above the pills (they don't overlap).
 - **Green camera dot:** while the camera is on, iOS shows its privacy indicator. Stopping the stream when you go back to the App Library turns it off.
 - **System home gesture:** swiping up from the very bottom of the screen leaves the web app, like any app. To return to the fake App Library, swipe up starting from just **above** the home bar.
 - A few pixels can differ from the real UI between iOS versions. That's what calibration step 5b is for.

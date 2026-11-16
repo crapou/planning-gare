@@ -145,16 +145,16 @@ export class Settings {
     /* --- camera UI layout --- */
     el.append(h('h2', {}, 'Interface Appareil photo'));
     el.append(h('div', { class: 'group' },
-      this.slider('Bande noire haute', 0, 120, 1, () => S.topBand, (v) => { S.topBand = v; this.commit('ui'); }, (v) => v + ' px'),
-      this.slider('Décalage aperçu', -60, 60, 1, () => S.previewShift, (v) => { S.previewShift = v; this.commit('ui'); }, (v) => v + ' px'),
-      this.slider('Écart modes', 0, 40, 1, () => S.modesGap, (v) => { S.modesGap = v; this.commit('ui'); }, (v) => v + ' px'),
-      this.slider('Hauteur déclencheur', 0, 90, 1, () => S.shutterLift, (v) => { S.shutterLift = v; this.commit('ui'); }, (v) => v + ' px'),
-      this.row('Bouton zoom', this.seg([['arrows', 'Flèches'], ['pill', '1×']], () => S.zoomStyle, (v) => { S.zoomStyle = v; this.commit('ui'); })),
-      this.row('Icône Live', this.seg([['yellow', 'Jaune'], ['white', 'Blanc'], ['off', 'Barré']], () => S.liveIcon, (v) => { S.liveIcon = v; this.commit('ui'); })),
+      this.slider('Décalage pilules haut', -40, 40, 0.5, () => S.topShift, (v) => { S.topShift = v; this.commit('ui'); }, (v) => v + ' px'),
+      this.slider('Décalage aperçu', -40, 40, 0.5, () => S.previewShift, (v) => { S.previewShift = v; this.commit('ui'); }, (v) => v + ' px'),
+      this.slider('Décalage commandes bas', -40, 40, 0.5, () => S.bottomShift, (v) => { S.bottomShift = v; this.commit('ui'); }, (v) => v + ' px'),
+      this.slider('Taille carré AF', 60, 160, 1, () => S.fbSize, (v) => { S.fbSize = v; this.commit('ui'); }, (v) => Math.round(v) + ' pt'),
+      this.row('Grille', this.sw(() => S.grid, (v) => { S.grid = v; this.commit('ui'); })),
+      this.row('Icônes', this.seg([['portrait', 'Téléphone droit'], ['capture', 'Comme la capture']], () => S.glyphRot, (v) => { S.glyphRot = v; this.commit('ui'); })),
       this.row('Résolution', this.seg([['max', 'Max'], ['1440', '1440p'], ['960', '960p']], () => S.resolution, (v) => { S.resolution = v; this.commit('stream'); })),
       this.slider('Calque camera_ref.png', 0, 1, 0.05, () => S.refOpacity, (v) => { S.refOpacity = v; this.commit('ui'); }, (v) => Math.round(v * 100) + ' %'),
     ));
-    el.append(h('p', { class: 'note' }, 'Montez le calque camera_ref.png à ~50 %, ouvrez la caméra et réglez les curseurs jusqu’à ce que l’interface se superpose exactement à votre capture.'));
+    el.append(h('p', { class: 'note' }, 'Pour comparer : « Icônes = Comme la capture » + calque camera_ref.png à ~50 %, puis ouvrez la caméra. Remettez « Téléphone droit » et le calque à 0 % avant de jouer (les icônes tournent avec le téléphone, comme dans la vraie app).'));
 
     /* --- App Library --- */
     el.append(h('h2', {}, 'Bibliothèque d’apps'));

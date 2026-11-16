@@ -53,42 +53,33 @@ export class Camera {
   /* ------------------------------ settings ------------------------------ */
   applySettings() {
     const st = document.documentElement.style;
-    st.setProperty('--top-band', S.topBand + 'px');
     st.setProperty('--preview-shift', S.previewShift + 'px');
-    st.setProperty('--modes-gap', S.modesGap + 'px');
-    st.setProperty('--shutter-lift', S.shutterLift + 'px');
-    $('#cam-zoom').classList.toggle('pill', S.zoomStyle === 'pill');
-    const live = $('#cam-live');
-    live.classList.toggle('yellow', S.liveIcon === 'yellow');
-    live.classList.toggle('off', S.liveIcon === 'off');
+    st.setProperty('--top-shift', S.topShift + 'px');
+    st.setProperty('--bottom-shift', S.bottomShift + 'px');
+    st.setProperty('--glyph-rot', S.glyphRot === 'capture' ? '0deg' : '90deg');
+    st.setProperty('--fb-size', S.fbSize + 'px');
+    $('#cam-grid').classList.toggle('off', !S.grid);
     this.ref.style.opacity = S.refOpacity;
     this.ref.hidden = !(S.refOpacity > 0) || this.refMissing;
     this.dbgSvg.toggleAttribute('hidden', !S.debug);
     this.dbgText.hidden = !S.debug;
-    requestAnimationFrame(() => this.centerModes());
     if (S.mode === 'B') this.tracker.load();
   }
 
   cardChanged() { this.overlay.setCard(S.card, S.overlay.w * window.innerWidth); }
   realismChanged() { this.overlay.rebuild(S.overlay.w * window.innerWidth); }
 
-  centerModes() {
-    const track = $('#mode-track');
-    const on = track.querySelector('.on');
-    if (!on) return;
-    const x = window.innerWidth / 2 - (on.offsetLeft + on.offsetWidth / 2);
-    track.style.transform = `translateX(${x}px)`;
-  }
-
   async loadThumb() {
-    // optional assets/thumb.jpg = your real last photo, shown in the thumbnail
-    const img = new Image();
-    img.onload = () => {
+    // assets/thumb.jpg|png = your real last photo, shown in the round thumbnail
+    for (const url of ['assets/thumb.jpg', 'assets/thumb.png']) {
+      const img = new Image();
+      const ok = await new Promise((r) => { img.onload = () => r(true); img.onerror = () => r(false); img.src = url; });
+      if (!ok) continue;
       const c = this.thumb.getContext('2d');
       const s = Math.min(img.width, img.height);
       c.drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, this.thumb.width, this.thumb.height);
-    };
-    img.src = 'assets/thumb.jpg';
+      return;
+    }
   }
 
   /* ------------------------------ geometry ------------------------------ */
@@ -170,7 +161,7 @@ export class Camera {
     this.startStream();
     if (S.mode === 'B') this.tracker.load();
     this.setCalibUI(this.calibrating);
-    this.centerModes();
+    if (S.focusSquare && !this.calibrating) setTimeout(() => this.showFocus(this.preview.clientWidth / 2, this.preview.clientHeight / 2, false, true), 380);
     requestAnimationFrame(this.loop);
     if (rect) this.animateLaunch(rect);
     else this.app.home.el.style.visibility = 'hidden';
@@ -384,12 +375,14 @@ export class Camera {
     }
   }
 
-  showFocus(x, y, lock = false) {
+  showFocus(x, y, lock = false, auto = false) {
     const pw = this.preview.clientWidth, ph = this.preview.clientHeight;
     const fb = this.focusBox;
+    const half = S.fbSize / 2 + 2;
     clearTimeout(this._fbT1); clearTimeout(this._fbT2);
-    fb.style.left = clamp(x, 40, pw - 66) + 'px';
-    fb.style.top = clamp(y, 40, ph - 40) + 'px';
+    fb.classList.toggle('auto', auto);
+    fb.style.left = clamp(x, half, pw - half - (auto ? 0 : 26)) + 'px';
+    fb.style.top = clamp(y, half, ph - half) + 'px';
     fb.hidden = false;
     fb.classList.remove('anim', 'dim');
     void fb.offsetWidth;

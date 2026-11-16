@@ -23,12 +23,12 @@ export const DEFAULTS = {
     mirror: true,             // mirror the fake card like the selfie preview
   },
   focusSquare: true,          // yellow AF square on tap, "VERROUILLAGE AE/AF" on long press
-  zoomStyle: 'arrows',        // 'arrows' (front camera) | 'pill'
-  liveIcon: 'white',          // 'yellow' | 'white' | 'off'
-  topBand: 46,                // px of black between status-bar area and preview
+  glyphRot: 'portrait',       // 'portrait' (phone upright) | 'capture' (exactly like camera_ref.png, phone sideways)
+  grid: true,                 // rule-of-thirds grid (on in camera_ref.png)
+  fbSize: 124.67,             // focus square size (pt), measured on camera_ref.png
   previewShift: 0,            // px
-  modesGap: 15,               // px between preview and the mode carousel
-  shutterLift: 34,            // px from home-indicator safe area to shutter bottom
+  topShift: 0,                // px (top pills)
+  bottomShift: 0,             // px (shutter + bottom row)
   refOpacity: 0,              // camera_ref.png overlay for alignment (0 = hidden)
   resolution: 'max',          // 'max' | '1440' | '960'
   trackHoldMs: 300,
